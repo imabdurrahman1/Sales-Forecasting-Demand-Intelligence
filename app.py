@@ -4,28 +4,61 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-# ----------------------------
+st.set_page_config(
+    page_title="Sales Forecasting Dashboard",
+    page_icon="📈",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+st.markdown("""
+<style>
+
+.main{
+    background-color:#F8F9FA;
+}
+
+.block-container{
+    padding-top:2rem;
+}
+
+h1,h2,h3{
+    color:#1F3B73;
+}
+
+section[data-testid="stSidebar"]{
+    background-color:#0E1117;
+}
+
+section[data-testid="stSidebar"] *{
+    color:white;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
 # Page Configuration
-# ----------------------------
+
 st.set_page_config(
     page_title="Sales Forecasting Dashboard",
     page_icon="📈",
     layout="wide"
 )
 
-# ----------------------------
+
 # Title
-# ----------------------------
-st.title("📈 Sales Forecasting & Demand Intelligence System")
+
+st.title("📈 End-to-End Sales Forecasting & Demand Intelligence System")
 
 st.markdown("""
-This dashboard provides business insights from historical sales data, demand forecasting,
-anomaly detection, and product demand segmentation.
+This dashboard provides business managers with a consolidated view of historical sales, forecasts, anomalies, and demand segmentation to support inventory planning and strategic decision-making.
 """)
 
-# ----------------------------
+st.divider()
+
+
 # Load Dataset
-# ----------------------------
+
 @st.cache_data
 def load_data():
     df = pd.read_csv("train.csv")
@@ -37,9 +70,9 @@ def load_data():
 
 sales_df = load_data()
 
-# ----------------------------
+
 # Load Analysis Outputs
-# ----------------------------
+
 
 forecast_df = pd.read_csv("outputs/forecast_summary.csv")
 
@@ -49,21 +82,42 @@ cluster_df = pd.read_csv("outputs/cluster_summary.csv")
 
 anomaly_df = pd.read_csv("outputs/anomaly_report.csv")
 
-# ----------------------------
+
 # Sidebar
-# ----------------------------
-st.sidebar.title("Navigation")
 
-page = st.sidebar.radio(
-    "Go to",
-    [
-        "Sales Overview",
-        "Forecast Explorer",
-        "Anomaly Report",
-        "Demand Segmentation"
-    ]
-)
+with st.sidebar:
 
+    st.image("https://img.icons8.com/fluency/96/combo-chart.png", width=70)
+
+    st.title("Sales Forecasting")
+
+    st.caption("Demand Intelligence Dashboard")
+
+    st.divider()
+
+    page = st.radio(
+        "Navigation",
+        [
+            "Sales Overview",
+            "Forecast Explorer",
+            "Anomaly Report",
+            "Demand Segmentation"
+        ]
+    )
+
+    st.divider()
+
+    st.markdown("### Project")
+
+    st.write("Xylofy AI Internship")
+
+    st.write("Version 1.7")
+
+    st.write("Developed by")
+
+    st.success("Abdur Rahman M")
+
+    
 if page == "Sales Overview":
 
     st.header("📊 Sales Overview")
@@ -80,6 +134,16 @@ if page == "Sales Overview":
     col3.metric("👥 Customers", total_customers)
     col4.metric("📦 Products", total_products)
 
+    st.info("""
+    ### Executive Summary
+
+    - 💰 Total Sales exceeded **$2.26 Million**
+    - 📈 XGBoost delivered the most accurate forecasts
+    - 🚨 11 major sales anomalies were detected
+    - 📦 Products were grouped into three demand segments
+    - 🎯 The dashboard supports data-driven inventory planning
+    """)
+
     monthly_sales = (
         sales_df
         .groupby(pd.Grouper(key="Order Date", freq="M"))["Sales"]
@@ -95,6 +159,7 @@ if page == "Sales Overview":
     )
 
     st.plotly_chart(fig, use_container_width=True)
+    
 
     st.subheader("Regional & Category Analysis")
 
@@ -131,6 +196,11 @@ if page == "Sales Overview":
     )
 
     st.plotly_chart(fig, use_container_width=True)
+    st.divider()
+
+    st.caption(
+        "Abdur Rahman M | Xylofy AI Internship Project | Sales Forecasting & Demand Intelligence System"
+    )
     
 elif page == "Forecast Explorer":
 
@@ -140,9 +210,7 @@ elif page == "Forecast Explorer":
         "Explore the forecast generated using the best-performing XGBoost model."
     )
 
-    # -----------------------------
     # Best Model Metrics
-    # -----------------------------
     best_model = model_df.loc[model_df["MAPE"].idxmin()]
 
     c1, c2, c3 = st.columns(3)
@@ -153,9 +221,7 @@ elif page == "Forecast Explorer":
 
     st.divider()
 
-    # -----------------------------
     # Forecast Type Selection
-    # -----------------------------
     forecast_type = st.radio(
         "Forecast Level",
         ["Category", "Region"],
@@ -209,9 +275,11 @@ elif page == "Forecast Explorer":
     - Prepare additional stock before expected demand peaks.
     - Review forecasts monthly as new sales data becomes available.
     """)
-# ============================================================
-# PAGE 3 : ANOMALY REPORT
-# ============================================================
+    st.divider()
+
+    st.caption(
+        "Abdur Rahman M | Xylofy AI Internship Project | Sales Forecasting & Demand Intelligence System"
+    )
 
 elif page == "Anomaly Report":
 
@@ -224,10 +292,6 @@ elif page == "Anomaly Report":
     """)
 
     st.divider()
-
-    # ----------------------------------------------------------
-    # KPI Cards
-    # ----------------------------------------------------------
 
     total_if = len(anomaly_df)
 
@@ -254,10 +318,6 @@ elif page == "Anomaly Report":
 
     st.divider()
 
-    # ----------------------------------------------------------
-    # Display Saved Chart
-    # ----------------------------------------------------------
-
     st.subheader("Sales Anomaly Detection")
 
     st.image(
@@ -270,10 +330,9 @@ elif page == "Anomaly Report":
     )
 
     st.divider()
+    
 
-    # ----------------------------------------------------------
     # Table
-    # ----------------------------------------------------------
 
     st.subheader("Detected Anomalies")
 
@@ -284,9 +343,8 @@ elif page == "Anomaly Report":
 
     st.divider()
 
-    # ----------------------------------------------------------
     # Business Interpretation
-    # ----------------------------------------------------------
+
 
     st.subheader("Business Interpretation")
 
@@ -319,10 +377,11 @@ Not every anomaly represents a problem.
 Some anomalies are positive opportunities (unexpected high demand),
 while others may indicate operational issues requiring immediate attention.
 """)
-    
-# ============================================================
-# PAGE 4 : PRODUCT DEMAND SEGMENTATION
-# ============================================================
+    st.divider()
+
+    st.caption(
+        "Abdur Rahman M | Xylofy AI Internship Project | Sales Forecasting & Demand Intelligence System"
+    )
 
 elif page == "Demand Segmentation":
 
@@ -338,9 +397,9 @@ of treating every product equally.
 
     st.divider()
 
-    # ------------------------------------------------------
+
     # Cluster Summary
-    # ------------------------------------------------------
+
 
     st.subheader("Demand Segment Summary")
 
@@ -351,9 +410,9 @@ of treating every product equally.
 
     st.divider()
 
-    # ------------------------------------------------------
+
     # Cluster Visualization
-    # ------------------------------------------------------
+
 
     st.subheader("Cluster Visualization")
 
@@ -368,9 +427,9 @@ of treating every product equally.
 
     st.divider()
 
-    # ------------------------------------------------------
+
     # Recommended Stocking Strategy
-    # ------------------------------------------------------
+
 
     st.subheader("Recommended Stocking Strategy")
 
@@ -399,9 +458,9 @@ of treating every product equally.
 
     st.divider()
 
-    # ------------------------------------------------------
+
     # Business Recommendations
-    # ------------------------------------------------------
+
 
     st.success("""
 Business Recommendations
@@ -424,3 +483,8 @@ Demand segmentation allows the supply chain team to
 allocate inventory budgets more effectively,
 reducing stock shortages while minimizing excess inventory.
 """)
+    st.divider()
+
+    st.caption(
+        "Abdur Rahman M | Xylofy AI Internship Project | Sales Forecasting & Demand Intelligence System"
+    )
